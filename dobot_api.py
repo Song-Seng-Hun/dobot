@@ -4,6 +4,7 @@ from tkinter import Text, END
 import datetime
 import numpy as np
 
+
 # Port Feedback
 MyType = np.dtype([(
     'len',
@@ -71,46 +72,6 @@ MyType = np.dtype([(
     ('joint_modes', np.float64, (6, )),
     ('v_actual', np.float64, (6, )),
     ('dummy', np.float64, (9, 6))])
-# ('hand_type', np.char, (4, )),
-# ('user', np.char,),
-# ('tool', np.char,),
-# ('run_queued_cmd', np.char,),
-# ('pause_cmd_flag', np.char,),
-# ('velocity_ratio', np.char,),
-# ('acceleration_ratio', np.char,),
-# ('jerk_ratio', np.char,),
-# ('xyz_velocity_ratio', np.char,),
-# ('r_velocity_ratio', np.char,),
-# ('xyz_acceleration_ratio', np.char,),
-# ('r_acceleration_ratio', np.char,),
-# ('xyz_jerk_ratio', np.char,),
-# ('r_jerk_ratio', np.char,),
-# ('brake_status', np.char,),
-# ('enable_status', np.char,),
-# ('drag_status', np.char,),
-# ('running_status', np.char,),
-# ('error_status', np.char,),
-# ('jog_status', np.char,),
-# ('robot_type', np.char,),
-# ('drag_button_signal', np.char,),
-# ('enable_button_signal', np.char,),
-# ('record_button_signal', np.char,),
-# ('reappear_button_signal', np.char,),
-# ('jaw_button_signal', np.char,),
-# ('six_force_online', np.char,),
-# ('reserve2', np.char, (82, )),
-# ('m_actual', np.float64, (6, )),
-# ('load', np.float64,),
-# ('center_x', np.float64,),
-# ('center_y', np.float64,),
-# ('center_z', np.float64,),
-# ('user[6]', np.float64, (6, )),
-# ('tool[6]', np.float64, (6, )),
-# ('trace_index', np.float64,),
-# ('six_force_value', np.float64, (6, )),
-# ('target_quaternion', np.float64, (4, )),
-# ('actual_quaternion', np.float64, (4, )),
-# ('reserve3', np.char, (24, ))])
 
 
 class DobotApi:
@@ -150,9 +111,9 @@ class DobotApi:
         Read the return value
         """
         data = self.socket_dobot.recv(1024)
-        # data_str = str(data, encoding="utf-8")
-        # self.log(f'Receive from 192.168.1.6:{self.port}: {data_str}')
-        # return data_str
+        data_str = str(data, encoding="utf-8")
+        self.log(f'Receive from 192.168.1.6:{self.port}: {data_str}')
+        return data_str
 
     def close(self):
         """
@@ -254,6 +215,26 @@ class DobotApiDashboard(DobotApi):
         status : Status of digital signal output port(0:Low level，1:High level
         """
         string = "DO({:d},{:d})".format(index, status)
+        self.send_data(string)
+        return self.wait_reply()
+
+    def ToolDO(self, index, status):
+        string = "ToolDO({:d},{:d})".format(index, status) 
+        self.send_data(string)
+        return self.wait_reply()
+        
+    def GetPose(self):
+        string = "GetPose()"
+        self.send_data(string)
+        return self.wait_reply()
+
+    def GetErrorID(self):
+        string = "GetErrorID()"
+        self.send_data(string)
+        return self.wait_reply()
+
+    def SetCollisionLevel(self, level):
+        string = "SetCollisionLevel({:d})".format(level)
         self.send_data(string)
         return self.wait_reply()
 
@@ -396,15 +377,6 @@ class DobotApiDashboard(DobotApi):
         Get robot error code
         """
         string = "GetErrorID()"
-        self.send_data(string)
-        return self.wait_reply()
-
-    
-    def HamGetPose(self):
-        """
-        Get robot error code
-        """
-        string = "GetPose()"
         self.send_data(string)
         return self.wait_reply()
 
